@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.http import HttpResponseNotFound
 
 from . import util
 
@@ -10,8 +11,11 @@ def index(request):
 
 
 def entry(request, title):
-    return render(request, "encyclopedia/entry.html", {
-        "title": title,
-        "entry": util.get_entry(title)
-    })
+    entry = util.get_entry(title)
+    if entry:
+        return render(request, "encyclopedia/entry.html", {
+            "title": title,
+            "entry": util.get_entry(title)
+        })
+    return render(request, "encyclopedia/404.html")
 
