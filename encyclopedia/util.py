@@ -1,5 +1,7 @@
 import re
 
+from django.urls import reverse
+from django.http import HttpResponseRedirect
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 
@@ -35,3 +37,8 @@ def get_entry(title):
         return f.read().decode("utf-8")
     except FileNotFoundError:
         return None
+
+
+def save_or_update_entry(title, content):
+    with open(f"C:\\Programming\\CS50 projects\\wiki\\entries\\{title}.md", "w") as f:
+        f.write(content)

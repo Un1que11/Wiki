@@ -6,4 +6,7 @@
 
 {% block body %}
     {{ entry }}
+    <form action="{% url 'update' title=title %}">
+        <input type="submit" value="Update">
+    </form>
 {% endblock%}

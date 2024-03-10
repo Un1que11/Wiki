@@ -3,13 +3,15 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponseBadRequest
 from django.urls import reverse
 
-import os
-
 from . import util
 
 class NewEntryForm(forms.Form):
     title = forms.CharField(label="Entry's Title")
     content = forms.CharField(widget=forms.Textarea)
+
+class UpdateEntryForm(forms.Form):
+    title = forms.CharField(widget=forms.HiddenInput()) 
+    content = forms.CharField(widget=forms.Textarea())
 
 
 def index(request):
@@ -32,7 +34,7 @@ def entry(request, title):
     if entry:
         return render(request, "encyclopedia/entry.html", {
             "title": title,
-            "entry": util.get_entry(title)
+            "entry": util.get_entry(title),
         })
     
     return render(request, "encyclopedia/404.html")
@@ -45,14 +47,33 @@ def add(request):
         form = NewEntryForm(request.POST)
         if form.is_valid():
             title = form.cleaned_data["title"]
+            content = form.cleaned_data.get("content")
             
             if title in entries:
                 return HttpResponseBadRequest("<h1>The entry already exists.</h1>")
 
-            content = form.cleaned_data.get("content")
-            with open(f"C:\\Programming\\CS50 projects\\wiki\\entries\\{title}.md", "w") as f:
-                f.write(content)
+            util.save_or_update_entry(title, content)
+
+            return HttpResponseRedirect(reverse("entry", kwargs={"title": title}))
 
     return render(request, "encyclopedia/add.html", {
-        "form": NewEntryForm()
+        "form": NewEntryForm(),
+    })
+
+
+def update(request, title):
+    entry = util.get_entry(title)
+
+    if request.method == "POST":
+        form = UpdateEntryForm(request.POST)
+        if form.is_valid():
+            content = form.cleaned_data.get("content")
+
+            util.save_or_update_entry(title, content.replace('\r\n', '\n'))
+
+            return HttpResponseRedirect(reverse("entry", kwargs={"title": title}))
+
+    return render(request, "encyclopedia/update.html", {
+        "form": UpdateEntryForm(initial={"title": title, "content": entry}),
+        "title": title,
     })
