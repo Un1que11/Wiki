@@ -3,6 +3,8 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponseBadRequest
 from django.urls import reverse
 
+from random import choice
+
 from . import util
 
 class NewEntryForm(forms.Form):
@@ -34,10 +36,21 @@ def entry(request, title):
     if entry:
         return render(request, "encyclopedia/entry.html", {
             "title": title,
-            "entry": util.get_entry(title),
+            "entry": entry,
         })
     
     return render(request, "encyclopedia/404.html")
+
+
+def random_entry(request):
+    entries = util.list_entries()
+    title = choice(entries)
+    entry = util.get_entry(title)
+
+    return render(request, "encyclopedia/entry.html", {
+        "title": title,
+        "entry": entry
+    })
 
 
 def add(request):
