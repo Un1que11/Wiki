@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block body %}
-    {{ entry }}
+    {{ entry | safe }}
     <form action="{% url 'update' title=title %}">
         <input type="submit" value="Update">
     </form>

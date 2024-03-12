@@ -2,6 +2,7 @@ from django import forms
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponseBadRequest
 from django.urls import reverse
+from markdown2 import markdown
 
 from random import choice
 
@@ -31,7 +32,7 @@ def index(request):
 
 
 def entry(request, title):
-    entry = util.get_entry(title)
+    entry = markdown(util.get_entry(title))
 
     if entry:
         return render(request, "encyclopedia/entry.html", {
@@ -45,7 +46,7 @@ def entry(request, title):
 def random_entry(request):
     entries = util.list_entries()
     title = choice(entries)
-    entry = util.get_entry(title)
+    entry = markdown(util.get_entry(title))
 
     return render(request, "encyclopedia/entry.html", {
         "title": title,
